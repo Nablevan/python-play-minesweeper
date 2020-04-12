@@ -34,8 +34,8 @@ m.click(original_point[0], original_point[1], button=1)
 # 屏幕抓取
 # start_time = time.time()
 # while True:
-#     screen = np.array(ImageGrab.grab(window))
-#     cv2.imshow('window', cv2.cvtColor(screen, cv2.COLOR_BGR2RGB))
+#     screen = cv2.cvtColor(np.array(ImageGrab.grab(window)), cv2.COLOR_BGR2RGB)
+#     cv2.imshow('window', screen)
 #     if cv2.waitKey(25) & 0xFF == ord('q'):
 #         cv2.destroyAllWindows()
 #         break
