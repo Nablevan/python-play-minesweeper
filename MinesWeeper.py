@@ -43,23 +43,39 @@ class MinesWeeper:
     def refresh_screen(self):
         self.screen = cv2.cvtColor(np.array(ImageGrab.grab(self.window)), cv2.COLOR_BGR2RGB)
 
-    def refresh_area(self):
+    def refresh_area(self):  # 刷新雷区内存
+        time.sleep(0.01)  # 等待10ms
         self.refresh_screen()
         for x in range(1, 31):
             for y in range(1, 17):
-                self.area[x-1][y-1] = self.get_num([x, y])   # TODO 确认扫描出的位置和色值
+                self.area[x - 1][y - 1] = self.get_num([x, y])
                 # self.click([x, y], 2)
                 # time.sleep(2)
 
     def get_block(self, locate: list):  # 获取[x,y]对应的方块(0,0)位置的色值
         # locate.reverse()
         # color = self.screen[self.ori_point[0] + 16 * (locate[0] - 1), self.ori_point[1] + 16 * (locate[1] - 1)]
-        color = self.screen_transpose[self.screen_ori_point[0] + 16 * (locate[0] - 1)][self.screen_ori_point[1] + 16 * (locate[1] - 1)]
-        return list(color)
+        color = self.screen_transpose[self.screen_ori_point[0] + 16 * (locate[0] - 1)][self.screen_ori_point[1] +
+                                                                                       16 * (locate[1] - 1)]
+        color = (color[2], color[1], color[0])  # BGR2RGB
+        return color
+
+    def get_block_middle(self, locate: list):  # 获取[x,y]对应的方块(8,8)位置的色值
+        # locate.reverse()
+        # color = self.screen[self.ori_point[0] + 16 * (locate[0] - 1), self.ori_point[1] + 16 * (locate[1] - 1)]
+        color = self.screen_transpose[self.screen_ori_point[0] + 16 * (locate[0] - 1) + 8][self.screen_ori_point[1] +
+                                                                                           16 * (locate[1] - 1) + 8]
+        color = (color[2], color[1], color[0])  # BGR2RGB
+        return color
 
     def get_num(self, locate: list):  # 获取[x,y]对应的方块的雷数
         color = tuple(self.get_block(locate))
-        return dict_num.get(color)
+        if equal(color, [255, 255, 255]):  # 未翻开
+            return -1
+        if equal(color, [128, 128, 128]):  # 已翻开
+            color = tuple(self.get_block_middle(locate))
+            return dict_num.get(color)
+        raise ValueError('undefined color', color)
 
     def click(self, locate: list, button=1):  # 点击[x,y]对应的方块 默认点击左键
         m = PyMouse()
